@@ -29,7 +29,10 @@ def mocked_openai() -> Generator[None, None, None]:
     compose_file_path = PROJECT_DIR / "mock-openai-docker-compose.yaml"
 
     # Start the Docker Compose to mock the OpenAI API
-    subprocess.run(["docker", "compose", "--file", str(compose_file_path), "up", "--detach"], check=True)
+    subprocess.run(
+        ["docker", "compose", "--file", str(compose_file_path), "up", "--detach"],
+        check=True,
+    )
 
     yield
 

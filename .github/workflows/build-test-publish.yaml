@@ -61,7 +61,7 @@ jobs:
       # run the pre-commit hooks including the openapi hooks to check any breaking changes
       # in the openapi schema/contract. If contract has breaking changes, the build will fail.
       - name: Run oasdiff, Lint, Format, and other static code quality checks
-        run: uvx --from pre-commit pre-commit run --all-files
+        run: SKIP=no-commit-to-branch uvx --from pre-commit pre-commit run --all-files
 
   build-wheel-and-sdist:
     runs-on: ubuntu-latest
@@ -109,7 +109,7 @@ jobs:
           uv venv
           source .venv/bin/activate
           uv pip install ./dist/*whl
-          uv pip install --group test
+          uv pip install --group test --group ci
           COVERAGE_DIR="$(python -c 'import files_api; print(files_api.__path__[0])')"
           poe test --cov="$COVERAGE_DIR"
 

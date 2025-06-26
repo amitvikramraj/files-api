@@ -5,10 +5,7 @@ import traceback
 from uuid import uuid4
 
 import loguru
-from fastapi import (
-    Request,
-    Response,
-)
+from fastapi import Request, Response
 from loguru import logger
 
 

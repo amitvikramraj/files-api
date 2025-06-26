@@ -316,14 +316,14 @@ function generate-client-library {
 
 # run linting, formatting, and other static code quality tools
 function lint {
-	uv run pre-commit run --all-files
+	uvx --from pre-commit pre-commit run --all-files
 }
 
 # same as `lint` but with any special considerations for CI
 function lint:ci {
 	# We skip no-commit-to-branch since that blocks commits to `main`.
 	# All merged PRs are commits to `main` so this must be disabled.
-	SKIP=no-commit-to-branch uv run pre-commit run --all-files
+	SKIP=no-commit-to-branch lint
 }
 
 # execute tests that are not marked as `slow`

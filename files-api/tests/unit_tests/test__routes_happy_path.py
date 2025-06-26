@@ -41,7 +41,13 @@ def test_list_files_with_pagination(client: TestClient):
     for i in range(15):
         client.put(
             f"/v1/files/file{i}.txt",
-            files={"file_content": (f"file{i}.txt", TEST_FILE_CONTENT, TEST_FILE_CONTENT_TYPE)},
+            files={
+                "file_content": (
+                    f"file{i}.txt",
+                    TEST_FILE_CONTENT,
+                    TEST_FILE_CONTENT_TYPE,
+                )
+            },
         )
     # List files with page size 10
     response = client.get("/v1/files?page_size=10")
@@ -56,7 +62,13 @@ def test_get_file_metadata(client: TestClient):
     # Create sample file
     client.put(
         url=f"/v1/files/{TEST_FILE_PATH}",
-        files={"file_content": ("folder1/file1.txt", TEST_FILE_CONTENT, TEST_FILE_CONTENT_TYPE)},
+        files={
+            "file_content": (
+                "folder1/file1.txt",
+                TEST_FILE_CONTENT,
+                TEST_FILE_CONTENT_TYPE,
+            )
+        },
     )
 
     # Query metadata for existing file
@@ -71,7 +83,13 @@ def test_get_file(client: TestClient):
     # Create sample file
     client.put(
         url=f"/v1/files/{TEST_FILE_PATH}",
-        files={"file_content": ("folder1/file1.txt", TEST_FILE_CONTENT, TEST_FILE_CONTENT_TYPE)},
+        files={
+            "file_content": (
+                "folder1/file1.txt",
+                TEST_FILE_CONTENT,
+                TEST_FILE_CONTENT_TYPE,
+            )
+        },
     )
 
     # Query a existing file
@@ -87,7 +105,13 @@ def test_delete_file(client: TestClient):
     # Create sample file
     client.put(
         url=f"/v1/files/{TEST_FILE_PATH}",
-        files={"file_content": ("folder1/file1.txt", TEST_FILE_CONTENT, TEST_FILE_CONTENT_TYPE)},
+        files={
+            "file_content": (
+                "folder1/file1.txt",
+                TEST_FILE_CONTENT,
+                TEST_FILE_CONTENT_TYPE,
+            )
+        },
     )
 
     # Delete existing file

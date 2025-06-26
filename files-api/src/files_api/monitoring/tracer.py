@@ -2,23 +2,14 @@
 
 import os
 from contextlib import contextmanager
-from typing import (
-    Any,
-    Generator,
-)
+from typing import Any, Generator
 
-from aws_xray_sdk.core import (
-    patch_all,
-    xray_recorder,
-)
+from aws_xray_sdk.core import patch_all, xray_recorder
 from aws_xray_sdk.core.models.facade_segment import FacadeSegment
 from aws_xray_sdk.core.models.segment import Segment
 from aws_xray_sdk.core.models.subsegment import Subsegment
 from aws_xray_sdk.core.utils.stacktrace import get_stacktrace
-from fastapi import (
-    Request,
-    Response,
-)
+from fastapi import Request, Response
 from loguru import logger
 
 

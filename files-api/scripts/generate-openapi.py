@@ -5,12 +5,7 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import (
-    Generator,
-    List,
-    NamedTuple,
-    Union,
-)
+from typing import Generator, List, NamedTuple, Union
 
 from fastapi.openapi.utils import get_openapi
 from files_api.main import create_app

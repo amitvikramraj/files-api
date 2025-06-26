@@ -2,10 +2,7 @@
 
 import pydantic
 from aws_embedded_metrics.logger.metrics_logger import MetricsLogger
-from fastapi import (
-    Request,
-    status,
-)
+from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from loguru import logger
 

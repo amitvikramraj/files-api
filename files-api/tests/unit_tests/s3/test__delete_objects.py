@@ -21,7 +21,11 @@ def test_delete_existing_s3_object(mocked_aws: None):
 def test_delete_nonexistent_s3_object(mocked_aws: None):
     """Test deleting a non-existent object from an S3 bucket."""
     # Create a file in the bucket
-    upload_s3_object(bucket_name=TEST_BUCKET_NAME, object_key="testfile-exists.txt", file_content=b"test content")
+    upload_s3_object(
+        bucket_name=TEST_BUCKET_NAME,
+        object_key="testfile-exists.txt",
+        file_content=b"test content",
+    )
     # delete the file
     delete_s3_object(bucket_name=TEST_BUCKET_NAME, object_key="testfile-exists.txt")
     # delete the file again

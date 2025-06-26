@@ -8,10 +8,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.routing import APIRoute
 
-from files_api.errors import (
-    handle_broad_exceptions__middleware,
-    handle_pydantic_validation_error,
-)
+from files_api.errors import handle_broad_exceptions__middleware, handle_pydantic_validation_error
 from files_api.monitoring.logger import inject_lambda_context__middleware
 from files_api.monitoring.metrics import start_metrics_context__middleware
 from files_api.monitoring.tracer import start_xray_tracing__middleware

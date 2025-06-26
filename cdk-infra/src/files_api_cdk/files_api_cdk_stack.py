@@ -1,12 +1,7 @@
 from pathlib import Path
 
 import aws_cdk as cdk
-from aws_cdk import (
-    Stack,
-    aws_apigateway as apigw,
-    aws_lambda as _lambda,
-    aws_s3 as s3,
-)
+from aws_cdk import Stack, aws_apigateway as apigw, aws_lambda as _lambda, aws_s3 as s3
 from constructs import Construct
 
 THIS_DIR = Path(__file__).parent

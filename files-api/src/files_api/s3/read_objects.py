@@ -1,11 +1,6 @@
 """Functions for reading objects from an S3 bucket--the "R" in CRUD."""
 
-from typing import (
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import List, Optional, Tuple, Union
 
 import boto3
 from aws_embedded_metrics.logger.metrics_logger import MetricsLogger

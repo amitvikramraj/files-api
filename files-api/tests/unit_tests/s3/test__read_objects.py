@@ -1,11 +1,7 @@
 """Test cases for `s3.read_objects`."""
 
 import boto3
-from files_api.s3.read_objects import (
-    fetch_s3_objects_metadata,
-    fetch_s3_objects_using_page_token,
-    object_exists_in_s3,
-)
+from files_api.s3.read_objects import fetch_s3_objects_metadata, fetch_s3_objects_using_page_token, object_exists_in_s3
 from tests.consts import TEST_BUCKET_NAME
 
 
@@ -34,7 +30,9 @@ def test_pagination(mocked_aws: None):
 
     # Fetch the next page
     files, next_page_token = fetch_s3_objects_using_page_token(
-        bucket_name=TEST_BUCKET_NAME, continuation_token=next_page_token, max_keys=max_pages
+        bucket_name=TEST_BUCKET_NAME,
+        continuation_token=next_page_token,
+        max_keys=max_pages,
     )
     assert len(files) == 2
     assert files[0]["Key"] == "testfile3.txt"
@@ -42,7 +40,9 @@ def test_pagination(mocked_aws: None):
 
     # Fetch the last page
     files, next_page_token = fetch_s3_objects_using_page_token(
-        bucket_name=TEST_BUCKET_NAME, continuation_token=next_page_token, max_keys=max_pages
+        bucket_name=TEST_BUCKET_NAME,
+        continuation_token=next_page_token,
+        max_keys=max_pages,
     )
     assert len(files) == 1
     assert files[0]["Key"] == "testfile5.txt"

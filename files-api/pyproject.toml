@@ -38,6 +38,9 @@ docker = [
     "uvicorn>=0.34.3",
 ]
 dev = ["files-api[aws-lambda,test,release,static-code-qa,stubs,notebooks,api]"]
+ci = [
+    "poethepoet>=0.35.0",
+]
 
 [tool.poe]
 executor.type = "uv"

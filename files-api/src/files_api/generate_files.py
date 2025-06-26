@@ -1,11 +1,6 @@
 """Generate text, images, and audio from prompts using OpenAI's API."""
 
-from typing import (
-    Literal,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Literal, Optional, Tuple, Union
 
 from aws_embedded_metrics import MetricsLogger
 from aws_embedded_metrics.storage_resolution import StorageResolution

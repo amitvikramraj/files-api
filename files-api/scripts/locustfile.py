@@ -6,11 +6,7 @@ this SO answer: https://stackoverflow.com/questions/74002094/aws-authentication-
 
 import random
 
-from locust import (
-    HttpUser,
-    between,
-    task,
-)
+from locust import HttpUser, between, task
 
 
 class FilesAPIUser(HttpUser):

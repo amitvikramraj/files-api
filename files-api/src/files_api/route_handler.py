@@ -1,17 +1,11 @@
 from typing import Callable
 
 from aws_embedded_metrics.logger.metrics_logger import MetricsLogger
-from fastapi import (
-    Request,
-    Response,
-)
+from fastapi import Request, Response
 from fastapi.routing import APIRoute
 from loguru import logger
 
-from files_api.monitoring.logger import (
-    log_request_info,
-    log_response_info,
-)
+from files_api.monitoring.logger import log_request_info, log_response_info
 from files_api.monitoring.metrics import metrics_ctx
 
 # Global variable to track cold starts

@@ -3,22 +3,10 @@
 import re
 from datetime import datetime
 from enum import Enum
-from typing import (
-    List,
-    Optional,
-)
+from typing import List, Optional
 
-from fastapi import (
-    Path,
-    status,
-)
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    field_validator,
-    model_validator,
-)
+from fastapi import Path, status
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from typing_extensions import Self
 
 DEFAULT_GET_FILES_PAGE_SIZE = 10

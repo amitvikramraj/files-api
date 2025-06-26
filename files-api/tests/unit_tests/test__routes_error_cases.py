@@ -42,7 +42,9 @@ def test_get_files_invalid_page_size(client: TestClient):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def test_get_files_page_token_is_mutually_exclusive_with_page_size_and_directory(client: TestClient):
+def test_get_files_page_token_is_mutually_exclusive_with_page_size_and_directory(
+    client: TestClient,
+):
     """Test that a 422 Unprocessable Entity error is returned when page_token is provided with page_size or directory."""
     response = client.get("/v1/files?page_token=token&directory=dir")
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

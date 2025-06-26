@@ -2,10 +2,7 @@ from contextvars import ContextVar
 
 from aws_embedded_metrics import metric_scope
 from aws_embedded_metrics.logger.metrics_logger import MetricsLogger
-from fastapi import (
-    Request,
-    Response,
-)
+from fastapi import Request, Response
 
 from files_api.monitoring.tracer import get_trace_context
 

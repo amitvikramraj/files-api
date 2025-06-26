@@ -4,26 +4,11 @@ import mimetypes
 from typing import Annotated
 
 import requests  # type: ignore
-from fastapi import (
-    APIRouter,
-    Body,
-    Depends,
-    File,
-    HTTPException,
-    Path,
-    Request,
-    Response,
-    UploadFile,
-    status,
-)
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Path, Request, Response, UploadFile, status
 from fastapi.responses import StreamingResponse
 from loguru import logger
 
-from files_api.generate_files import (
-    generate_image,
-    generate_text_to_speech,
-    get_text_chat_completion,
-)
+from files_api.generate_files import generate_image, generate_text_to_speech, get_text_chat_completion
 from files_api.route_handler import RouteHandler
 from files_api.s3.delete_objects import delete_s3_object
 from files_api.s3.read_objects import (
@@ -118,7 +103,9 @@ async def upload_file(
     },
 )
 async def list_files(
-    request: Request, response: Response, query_params: Annotated[GetFilesQueryParams, Depends()]
+    request: Request,
+    response: Response,
+    query_params: Annotated[GetFilesQueryParams, Depends()],
 ) -> GetFilesResponse:
     """List Files with Pagination."""
     settings: Settings = request.app.state.settings
@@ -266,7 +253,9 @@ async def get_file_metadata(file_path: str, request: Request, response: Response
     },
 )
 async def get_file(
-    request: Request, response: Response, file_path: Annotated[str, Path(description="The path to the file.")]
+    request: Request,
+    response: Response,
+    file_path: Annotated[str, Path(description="The path to the file.")],
 ) -> StreamingResponse:
     """Retrieve a File."""
     settings: Settings = request.app.state.settings
@@ -310,7 +299,9 @@ async def get_file(
     },
 )
 async def delete_file(
-    request: Request, response: Response, file_path: Annotated[str, Path(description="The path to the file.")]
+    request: Request,
+    response: Response,
+    file_path: Annotated[str, Path(description="The path to the file.")],
 ) -> Response:
     """Delete a file.
 
@@ -390,11 +381,15 @@ async def generate_file_using_openai(
         logger.error(f"File already exists: {body.file_path}")
         response.status_code = status.HTTP_400_BAD_REQUEST
         return PostFileResponse(
-            file_path=body.file_path, message="File already exists. Please use a different file name."
+            file_path=body.file_path,
+            message="File already exists. Please use a different file name.",
         )
 
     # Generate the file based on the file type
-    logger.debug("Trying to generate content using OpenAI, request_body = {body}", body=body.model_dump_json())
+    logger.debug(
+        "Trying to generate content using OpenAI, request_body = {body}",
+        body=body.model_dump_json(),
+    )
     if body.file_type == GeneratedFileType.TEXT:
         file_content = await get_text_chat_completion(prompt=body.prompt)
         file_content_bytes: bytes = file_content.encode("utf-8")  # convert string to bytes
@@ -405,7 +400,10 @@ async def generate_file_using_openai(
         image_response = requests.get(image_url)  # pylint: disable=missing-timeout
         file_content_bytes = image_response.content
 
-        logger.debug("Image file generated successfully, image_url: {image_url}", image_url=image_url)
+        logger.debug(
+            "Image file generated successfully, image_url: {image_url}",
+            image_url=image_url,
+        )
     else:
         response_format = body.file_path.split(".")[-1]
         file_content_bytes, content_type = await generate_text_to_speech(
@@ -418,7 +416,10 @@ async def generate_file_using_openai(
     logger.debug(f"Content-Type for the generated file: {content_type}")
 
     # Upload the generated file to S3
-    logger.debug("Trying to upload the generated file to S3: {file_path}", file_path=body.file_path)
+    logger.debug(
+        "Trying to upload the generated file to S3: {file_path}",
+        file_path=body.file_path,
+    )
     upload_s3_object(
         bucket_name=s3_bucket_name,
         object_key=body.file_path,
@@ -426,7 +427,10 @@ async def generate_file_using_openai(
         content_type=content_type,
     )
 
-    logger.info("Generated file uploaded successfully at path: {file_path}", file_path=body.file_path)
+    logger.info(
+        "Generated file uploaded successfully at path: {file_path}",
+        file_path=body.file_path,
+    )
     response.status_code = status.HTTP_201_CREATED
     return PostFileResponse(
         file_path=body.file_path,

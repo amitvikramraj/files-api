@@ -1,9 +1,6 @@
 import argparse
 import json
-from datetime import (
-    datetime,
-    timezone,
-)
+from datetime import datetime, timezone
 from pathlib import Path
 
 import boto3
