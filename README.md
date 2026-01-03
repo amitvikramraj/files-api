@@ -102,6 +102,14 @@ Install [`uv`](https://docs.astral.sh/uv/getting-started/installation/) and node
 
 ## Images
 
+### Load Testing with Locust:
+
+<p align="center">
+    <img src="docs/images/locust-load-test-real-endpoint.png" alt="locust-dashboard"/>
+    <text>Locust Dashboard showing Deployed API performance under load</text><br>
+</p>
+
+
 ### Traces:
 
 <p align="center">
