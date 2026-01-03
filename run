@@ -111,7 +111,7 @@ run-local() {
 	uv run -- uvicorn 'files_api.main:create_app' --factory --host 0.0.0.0 --port 8000 --reload
 
 	# Unset the environment variables
-	unset $OPENAI_API_KEY
+	unset OPENAI_API_KEY
 }
 
 # start the FastAPI app, pointed at a mocked aws endpoint
@@ -257,6 +257,9 @@ test:ci() {
 # (example) ./run.sh test tests/test_states_info.py::test__slow_add
 run-tests() {
 	PYTEST_EXIT_STATUS=0
+
+	# Unset AWS credentials
+	unset AWS_PROFILE
 
 	# Disable AWS X-Ray and AWS EMF
 	export AWS_XRAY_SDK_ENABLED="false"
