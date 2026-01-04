@@ -1,6 +1,6 @@
 [project]
 name = "files-api"
-version = "0.1.1"
+version = "0.1.2"
 description = "Files API to upload and download files from S3 using FastAPI."
 readme = "README.md"
 authors = [

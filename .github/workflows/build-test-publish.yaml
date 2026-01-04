@@ -36,6 +36,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for version tagging
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
@@ -135,7 +137,7 @@ jobs:
       #     # ...
       - name: Push Version Tag
         # https://github.com/gnprice/toml-cli
-        run: |
+        run: |-
           VERSION=$(uvx --from=toml-cli toml get --toml-path pyproject.toml project.version)
           git tag "v$VERSION"
           git push origin --tags
