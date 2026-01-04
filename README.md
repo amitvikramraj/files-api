@@ -67,6 +67,9 @@ Install [`uv`](https://docs.astral.sh/uv/getting-started/installation/), [aws-cl
     ```
 
 - Create a `.openai.env` file with your OpenAI API key
+  ```bash
+  export OPENAI_API_KEY=your_openai_api_key_here
+  ```
 
 - Clean Up
     ```bash
@@ -177,6 +180,11 @@ Install [`uv`](https://docs.astral.sh/uv/getting-started/installation/), [aws-cl
 
 
 Similary, you can view other metrics like Lambda Invocations, Duration, Errors, Throttles etc. and for S3 as well.
+
+
+## TODO
+
+- [ ] Setup the Dockerfile with the recommended way of using [uv in Docker](https://docs.astral.sh/uv/guides/integration/docker/).
 
 
 ## Contributing
