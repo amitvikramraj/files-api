@@ -13,10 +13,9 @@ services:
   locust:
     image: locustio/locust:latest
     command: >
-      --locustfile /locustfile.py --host=https://k4cspk2km1.execute-api.us-west-2.amazonaws.com/prod --users 100 --spawn-rate 5 --autostart
-    # --locustfile /locustfile.py --host=http://fastapi:8000 --users 1 --spawn-rate 1 --autostart
-    # --locustfile /locustfile.py --host=https://3rbeuvjyd3.execute-api.us-west-2.amazonaws.com/prod --users 1 --spawn-rate 1 --autostart
-    # --locustfile /locustfile.py --host=https://j0o3bozns6.execute-api.ap-south-1.amazonaws.com/prod/ --users 1 --spawn-rate 1 --autostart
+      --locustfile /locustfile.py --host=http://fastapi:8000 --users 1 --spawn-rate 1 --autostart
+    # --locustfile /locustfile.py --host=https://k4cspk2km1.execute-api.us-west-2.amazonaws.com/prod --users 100 --spawn-rate 5 --autostart
+
     ports:
       - "8089:8089"
     volumes:

@@ -1,11 +1,12 @@
 [project]
 name = "files-api"
-version = "0.1.0"
+version = "0.1.1"
 description = "Files API to upload and download files from S3 using FastAPI."
 readme = "README.md"
 authors = [
     { name = "avr2002", email = "avr13405@gmail.com" }
 ]
+license = { text="MIT" }
 requires-python = ">=3.12"
 dependencies = [
     "aws-embedded-metrics>=3.3.1",
