@@ -13,7 +13,7 @@ This project is a more polished version of the [cloud-engineering-project](https
 
 
 <p align="center">
-    <img src="docs/images/deployed-api.png" alt="files-api"/>
+    <img src="docs/images/deployed-API.png" alt="files-api"/>
 </p>
 
 ***In this project, we built ––***
@@ -25,6 +25,8 @@ This project is a more polished version of the [cloud-engineering-project](https
 * Setup load testing with Locust
 * We wrote API Contract using OpenAPI spec, auto-generated from FastAPI code, with pre-commit hooks using `oasdiff` to catch breaking changes and OpenAPI Generator to create a Python client SDK for the API.
 * Serverless Deployment: Deployed the app using AWS CDK with Docker on AWS Lambda and exposed it via API Gateway.
+  * Using AWS Secrets Manager to store OpenAI API keys and
+  * Using [`AWS-Parameters-and-Secrets-Lambda-Extension`](https://docs.aws.amazon.com/lambda/latest/dg/with-secrets-manager.html) to securely fetch it inside the Lambda function.
 * CI/CD Pipeline: Automated testing and deployment using GitHub Actions.
 * Observability & Monitoring:
   * Setup in-depth logging on AWS CloudWatch using loguru.
