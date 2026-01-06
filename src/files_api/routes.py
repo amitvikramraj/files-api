@@ -19,7 +19,7 @@ from fastapi import (
 from fastapi.responses import StreamingResponse
 from loguru import logger
 
-from files_api.generate_files import (
+from files_api.generate_files.openai import (
     generate_image,
     generate_text_to_speech,
     get_text_chat_completion,
@@ -409,6 +409,12 @@ async def generate_file_using_openai(
         # Download the image from the URL
         image_response = requests.get(image_url)  # pylint: disable=missing-timeout
         file_content_bytes = image_response.content
+
+        # For Gemini image generation:
+        # image_bytes = await generate_image(prompt=body.prompt)
+        # if image_bytes is None:
+        #     raise ValueError("Failed to generate image from Gemini")
+        # file_content_bytes = image_bytes
 
         logger.debug("Image file generated successfully, image_url: {image_url}", image_url=image_url)
     else:
