@@ -2,7 +2,13 @@ import os
 from pathlib import Path
 
 import aws_cdk as cdk
-from aws_cdk import Stack, aws_apigateway as apigw, aws_lambda as _lambda, aws_s3 as s3
+from aws_cdk import (
+    Stack,
+    aws_apigateway as apigw,
+    aws_lambda as _lambda,
+    aws_s3 as s3,
+    aws_secretsmanager as secretsmanager,
+)
 from constructs import Construct
 
 THIS_DIR = Path(__file__).parent
@@ -24,6 +30,23 @@ class FilesApiCdkStack(Stack):
             auto_delete_objects=True,
             removal_policy=cdk.RemovalPolicy.DESTROY,
         )
+
+        # Create a Secret to store OpenAI API Key
+        openai_api_secret_key = secretsmanager.Secret(
+            self,
+            id="OpenAIApiSecretKey",
+            description="OpenAI API Key to generate text, images, and audio using OpenAI's API",
+            secret_name="files-api/openai-api-key",
+            # secret_string_value=...,
+            # ^^^AWS discourages to pass the secret value directly in the CDK code as the value will be included in the
+            # output of the cdk as part of synthesis, and will appear in the CloudFormation template in the console
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+        )
+        # ^^^The recommended way is to leave this field empty and manually add the secret value in the Secrets Manager console after deploying the stack.
+        # AWS Secrets Manager will automatically create a placeholder/empty secret for you
+        # The secret exists in AWS, but initially has no value (or a generated random value depending on the context).
+
+        # This way, the secret value never appears in code, outputs, or CloudFormation templates.
 
         # Create a Lambda function & Lambda Layer
         files_api_lambda_layer = _lambda.LayerVersion(
@@ -54,6 +77,17 @@ class FilesApiCdkStack(Stack):
             removal_policy=cdk.RemovalPolicy.DESTROY,
         )
 
+        # Add AWS parameters and secrets Lambda extension to read secrets from Secrets Manager
+        # ref: https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets_lambda.html
+        # ref: https://docs.aws.amazon.com/lambda/latest/dg/with-secrets-manager.html
+        secrets_manager_lambda_extension_layer = _lambda.LayerVersion.from_layer_version_arn(
+            self,
+            id="SecretsManagerExtensionLayer",
+            layer_version_arn=f"arn:aws:lambda:{self.region}:345057560386:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:23",
+        )
+        # ^^^I found the layer ARN here from the AWS docs:
+        # https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html#ps-integration-lambda-extensions-add
+
         files_api_lambda = _lambda.Function(
             self,
             id="FilesApiLambda",
@@ -68,7 +102,7 @@ class FilesApiCdkStack(Stack):
                 path=(THIS_DIR / "src").as_posix(),
                 exclude=["tests/*", ".venv", "*.pyc", "__pycache__", ".git"],
             ),
-            layers=[files_api_lambda_layer],
+            layers=[files_api_lambda_layer, secrets_manager_lambda_extension_layer],
             tracing=_lambda.Tracing.ACTIVE,
             environment={
                 "S3_BUCKET_NAME": files_api_bucket.bucket_name,
@@ -76,12 +110,25 @@ class FilesApiCdkStack(Stack):
                 "AWS_EMF_NAMESPACE": "files-api",
                 "AWS_XRAY_TRACING_NAME": "Files API",
                 "AWS_XRAY_DAEMON_CONTEXT_MISSING": "RUNTIME_ERROR",
-                "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"],
+                # "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"],
+                "OPENAI_API_SECRET_NAME": openai_api_secret_key.secret_name,
+                # AWS Parameters and Secrets Lambda Extension configuration
+                # You can find all the supported environment variables here:
+                # https://docs.aws.amazon.com/lambda/latest/dg/with-secrets-manager.html
+                "PARAMETERS_SECRETS_EXTENSION_HTTP_PORT": "2773",
+                # ^^^Port on which the AWS Parameters and Secrets Lambda Extension listens by default
+                "PARAMETERS_SECRETS_EXTENSION_CACHE_ENABLED": "TRUE",
+                # Enable caching of secrets to reduce latency and cost
+                "SECRETS_MANAGER_TTL": "300",  # Cache secrets for 300 seconds (5 minutes)
+                # Time-to-live for cached secrets.
             },
         )
 
         # Grant the Lambda function permissions to read/write to the S3 bucket
         files_api_bucket.grant_read_write(files_api_lambda)
+
+        # Grant the Lambda function permissions to read the OpenAI API Key secret
+        openai_api_secret_key.grant_read(files_api_lambda)
 
         # Setup API Gateway with resources and methods
 
