@@ -13,7 +13,7 @@ This project is a more polished version of the [cloud-engineering-project](https
 
 
 <p align="center">
-    <img src="docs/images/deployed-API.png" alt="files-api"/>
+    <img src="docs/images/deployed-api.png" alt="files-api"/>
 </p>
 
 ***In this project, we built ––***
