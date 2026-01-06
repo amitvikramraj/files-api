@@ -25,6 +25,7 @@ This project is a more polished version of the [cloud-engineering-project](https
 * Setup load testing with Locust
 * We wrote API Contract using OpenAPI spec, auto-generated from FastAPI code, with pre-commit hooks using `oasdiff` to catch breaking changes and OpenAPI Generator to create a Python client SDK for the API.
 * Serverless Deployment: Deployed the app using AWS CDK with Docker on AWS Lambda and exposed it via API Gateway.
+    > *NOTE: After deploying, make sure to update the secret in Secrets Manager with your OpenAI API key.*
   * Using AWS Secrets Manager to store OpenAI API keys and
   * Using [`AWS-Parameters-and-Secrets-Lambda-Extension`](https://docs.aws.amazon.com/lambda/latest/dg/with-secrets-manager.html) to securely fetch it inside the Lambda function.
 * CI/CD Pipeline: Automated testing and deployment using GitHub Actions.
@@ -33,6 +34,27 @@ This project is a more polished version of the [cloud-engineering-project](https
   * Implemented tracing with AWS X-Ray, both correlating logs and traces using trace-IDs.
   * Custom Metrics with AWS CloudWatch Metrics using `aws-embedded-metrics`.
 
+
+## TODO
+
+- [x] Added Secret Manager to store OpenAI API key securely.
+- [ ] Setup the Dockerfile with the recommended way of using [uv in Docker](https://docs.astral.sh/uv/guides/integration/docker/).
+- [ ] Implement API versioning strategy (like v1 in the path).
+- [ ] Implement authentication (API keys or AWS Cognito) and secure Swagger UI page and possiblly the API endpoints as well.
+  - [ ] Add rate limiting to the API using API Gateway
+- [ ] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
+  - [ ] Implement multi-environment deployment pipeline (dev/prod) with approval gates
+- [ ] Observability & Monitoring improvements:
+  - [ ] Use OpenTelemetry for tracing instead of AWS X-Ray, [ref](https://aws.amazon.com/blogs/mt/aws-x-ray-sdks-daemon-migration-to-opentelemetry/).
+  - [ ] Setup Grafana dashboards with CloudWatch data sources for enhanced monitoring
+  - [ ] Replace Cloudwatch with Grafana Stack -- logs, metrics and traces
+- [ ] Container Orchestration:
+  - [ ] Containerize the app and deploy it using Application Load Balancer
+    - [ ] ECS Fargate (Serverless)
+    - [ ] Amazon EC2
+  - [ ] Setup auto-scaling based on request load or CPU/memory usage
+  - [ ] Deploy on Kubernetes EKS (Kubernetes)
+- [ ] Add custom domain with Route53 and ACM for HTTPS (`https://api.myapp.com/v1/`)
 
 ## Setup
 
@@ -182,11 +204,6 @@ Install [`uv`](https://docs.astral.sh/uv/getting-started/installation/), [aws-cl
 
 
 Similary, you can view other metrics like Lambda Invocations, Duration, Errors, Throttles etc. and for S3 as well.
-
-
-## TODO
-
-- [ ] Setup the Dockerfile with the recommended way of using [uv in Docker](https://docs.astral.sh/uv/guides/integration/docker/).
 
 
 ## Contributing
