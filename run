@@ -1,20 +1,28 @@
 #!/usr/bin/env bash
 
-set -euox pipefail
+set -euo pipefail
 
 export AWS_PROFILE=sandbox
 export AWS_REGION=us-west-2
 export AWS_DEFAULT_REGION=${AWS_REGION}
 
 # aws account id/hash used to make a unique, but consistent bucket name
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --profile $AWS_PROFILE --query "Account" --output text)
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --profile $AWS_PROFILE --query "Account" --output text || echo "")
 
-AWS_ACCOUNT_ID_HASH=$(echo -n "${AWS_ACCOUNT_ID}" | sha256sum | cut -c5-8)
-export S3_BUCKET_NAME="python-aws-cloud-course-bucket-${AWS_ACCOUNT_ID_HASH}" # python-aws-cloud-course-bucket-6721
+# Only create bucket name if AWS_ACCOUNT_ID is available
+# Suppress errors if profile doesn't exist (e.g., in CI/CD)
+if [ -n "$AWS_ACCOUNT_ID" ]; then
+    AWS_ACCOUNT_ID_HASH=$(echo -n "${AWS_ACCOUNT_ID}" | sha256sum | cut -c5-8)
+    export S3_BUCKET_NAME="python-aws-cloud-course-bucket-${AWS_ACCOUNT_ID_HASH}" # python-aws-cloud-course-bucket-6721
+else
+    echo "WARNING: Could not retrieve AWS Account ID. Profile '$AWS_PROFILE' may not exist."
+	echo "S3_BUCKET_NAME environment variable will not be set."
+fi
+
+
 
 
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
 
 
 ##########################
@@ -32,6 +40,12 @@ cdk-deploy () {
 	# Check if Docker is running
 	if ! docker info >/dev/null 2>&1; then
 		echo "Docker is not running. Please start Docker Desktop and try again."
+		exit 1
+	fi
+
+	# If S3_BUCKET_NAME is not set, exit with error
+	if [ -z "${S3_BUCKET_NAME:-}" ]; then
+		echo "ERROR: S3_BUCKET_NAME is not set. Cannot deploy CDK stack."
 		exit 1
 	fi
 
