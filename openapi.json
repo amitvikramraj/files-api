@@ -3,15 +3,16 @@
   "info": {
     "title": "Files API",
     "summary": "Store and Retrieve Files.",
-    "description": "<a href=\"https://github.com/avr2002\" target=\"_blank\">            <img src=\"https://img.shields.io/badge/Maintained%20by-Amit%20Vikram%20Raj-F4BBFF?style=for-the-badge\">        </a>\n\n| Helpful Links | Notes |\n| --- | --- |\n| [MLOps Club](https://mlops-club.org) | ![MLOps Club](https://img.shields.io/badge/Memember%20of-MLOps%20Club-05998B?style=for-the-badge) |\n| [Project Repo](https://github.com/avr2002/cloud-engineering-project) | `avr2002/cloud-engineering-project` |\n",
+    "description": "<a href=\"https://github.com/avr2002\" target=\"_blank\">            <img src=\"https://img.shields.io/badge/Maintained%20by-Amit%20Vikram%20Raj-F4BBFF?style=for-the-badge\">        </a>\n<a href=\"https://github.com/avr2002/files-api\" target=\"_blank\">            <img src=\"https://img.shields.io/badge/github-repo-000000?style=for-the-badge&logo=github\">        </a>\n<a href=\"https://mlops-club.org\" target=\"_blank\">            <img src=\"https://img.shields.io/badge/MLOps%20Club-05998B?style=for-the-badge\">        </a>\n<br>\n",
     "contact": {
       "name": "Amit Vikram Raj",
       "url": "https://www.linkedin.com/in/avr27/",
       "email": "raj.amitvikram@gmail.com"
     },
     "license": {
-      "name": "Apache 2.0",
-      "identifier": "MIT"
+      "name": "MIT License",
+      "identifier": "MIT",
+      "url": "https://github.com/avr2002/files-api/blob/main/LICENSE"
     },
     "version": "v1"
   },
