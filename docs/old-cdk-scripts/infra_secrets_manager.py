@@ -7,7 +7,7 @@ from aws_cdk import (
     aws_apigateway as apigw,
     aws_lambda as _lambda,
     aws_s3 as s3,
-    aws_ssm as ssm,
+    aws_secretsmanager as secretsmanager,
 )
 from constructs import Construct
 
@@ -31,16 +31,22 @@ class FilesApiCdkStack(Stack):
             removal_policy=cdk.RemovalPolicy.DESTROY,
         )
 
-        # CloudFormation does not support creating SecureString parameters.
-        # So, we manually create the parameter of type SecureString in the console,
-        # then reference it here in CDK.
-        # Reference an existing SecureString parameter from SSM Parameter Store
-        ssm_openai_api_secret_key = ssm.StringParameter.from_secure_string_parameter_attributes(
+        # Create a Secret to store OpenAI API Key
+        openai_api_secret_key = secretsmanager.Secret(
             self,
-            id="ExistingOpenAIApiSecretKey",
-            parameter_name="/files-api/openai-api-key",
-            version=1,
+            id="OpenAIApiSecretKey",
+            description="OpenAI API Key to generate text, images, and audio using OpenAI's API",
+            secret_name="files-api/openai-api-key",
+            # secret_string_value=...,
+            # ^^^AWS discourages to pass the secret value directly in the CDK code as the value will be included in the
+            # output of the cdk as part of synthesis, and will appear in the CloudFormation template in the console
+            removal_policy=cdk.RemovalPolicy.DESTROY,
         )
+        # ^^^The recommended way is to leave this field empty and manually add the secret value in the Secrets Manager console after deploying the stack.
+        # AWS Secrets Manager will automatically create a placeholder/empty secret for you
+        # The secret exists in AWS, but initially has no value (or a generated random value depending on the context).
+
+        # This way, the secret value never appears in code, outputs, or CloudFormation templates.
 
         # Create a Lambda function & Lambda Layer
         files_api_lambda_layer = _lambda.LayerVersion(
@@ -107,7 +113,7 @@ class FilesApiCdkStack(Stack):
                 "AWS_XRAY_TRACING_NAME": "Files API",
                 "AWS_XRAY_DAEMON_CONTEXT_MISSING": "RUNTIME_ERROR",
                 # "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"],
-                "OPENAI_API_SECRET_NAME": ssm_openai_api_secret_key.parameter_name,
+                "OPENAI_API_SECRET_NAME": openai_api_secret_key.secret_name,
                 # AWS Parameters and Secrets Lambda Extension configuration
                 # You can find all the supported environment variables here:
                 # https://docs.aws.amazon.com/lambda/latest/dg/with-secrets-manager.html
@@ -124,7 +130,7 @@ class FilesApiCdkStack(Stack):
         files_api_bucket.grant_read_write(files_api_lambda)
 
         # Grant the Lambda function permissions to read the OpenAI API Key secret
-        ssm_openai_api_secret_key.grant_read(files_api_lambda)
+        openai_api_secret_key.grant_read(files_api_lambda)
 
         # Setup API Gateway with resources and methods
 

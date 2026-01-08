@@ -116,7 +116,7 @@ There are multiple ways to access secrets within an AWS Lambda function. In all 
         except ClientError as e:
             # Handle exceptions such as ResourceNotFoundException
             raise e
-        
+
         # Decrypts secret using the associated KMS key.
         if 'SecretString' in get_secret_value_response:
             return get_secret_value_response['SecretString']
@@ -132,7 +132,7 @@ There are multiple ways to access secrets within an AWS Lambda function. In all 
         if CACHED_SECRET is None:
             CACHED_SECRET = get_secret()
             os.environ["MY_API_KEY"] = CACHED_SECRET
-        
+
         # ... DO STUFF WITH THE SECRET ...
 
         return {
@@ -244,7 +244,7 @@ There are multiple ways to access secrets within an AWS Lambda function. In all 
 
 
 3. Using the [`aws-lambda-powertools` Parameters utility](https://docs.aws.amazon.com/powertools/python/latest/utilities/parameters/) to fetch secrets.
-   
+
    * This utility provides built-in caching and simplifies secret retrieval.
    * However, it adds an additional dependency to your Lambda function, if you are okay with that.
    * The Parameters utility has other functionalities as well and integrates with other AWS services like SSM Parameter Store, AppConfig along with Secrets Manager.
@@ -259,20 +259,20 @@ There are multiple ways to access secrets within an AWS Lambda function. In all 
         try:
             # Get secret with caching (default TTL: 5 seconds)
             secret_value = parameters.get_secret("my-app/super-secret-api-key")
-            
+
             # Get secret with custom TTL
             secret_with_ttl = parameters.get_secret("my-app/super-secret-api-key", max_age=300)
-            
+
             # Get secret and transform JSON
             secret_json = parameters.get_secret("my-app/super-secret-api-key", transform="json")
-            
+
             logger.info("Successfully retrieved secrets")
-            
+
             return {
                 'statusCode': 200,
                 'body': 'Successfully retrieved secrets'
             }
-            
+
         except Exception as e:
             logger.error(f"Error retrieving secret: {str(e)}")
             return {
@@ -292,7 +292,7 @@ It lets you:
 * Automate fixes
 * Patch systems
 * See what’s running where
-    
+
     —all from the AWS console or API.
 
 
@@ -303,7 +303,7 @@ One of the services provided by SSM is Parameter Store, which allows you to secu
 AWS Systems Manager Parameter Store consists of standard and advanced parameters.
 
 > [Pricing Page](https://aws.amazon.com/systems-manager/pricing/) for SSM Parameter Store.
-> 
+>
 > [Docs: Parametes Tiers](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-advanced-parameters.html)
 
 * Standard parameters are available at no additional charge.
@@ -330,7 +330,7 @@ There is also a Intelligent Tier that automatically moves parameters between sta
 * Parameter Store provides support for three types of parameters: `String`, `StringList`, and `SecureString`.
 
 * `SecureString` data is encrypted and decrypted using an AWS KMS key.
-  * You can use either a default KMS key provided by AWS or create and use your own AWS KMS key. 
+  * You can use either a default KMS key provided by AWS or create and use your own AWS KMS key.
   * The AWS managed key is free to use, but if you create your own KMS key, you will incur charges for using it.
   * Read more about [AWS KMS Pricing here](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html)
 
