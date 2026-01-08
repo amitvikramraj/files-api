@@ -38,7 +38,7 @@ This project is a more polished version of the [cloud-engineering-project](https
 ## TODO
 
 - [x] Added Secret Manager to store OpenAI API key securely.
-- [x] Used AWS SSM Parameter Store to store the OpenAI API key instead of Secrets Manager. [ref](docs/Secrets-Manager.md)
+- [x] Used AWS SSM Parameter Store to store the OpenAI API key instead of Secrets Manager. [ref](docs/Secrets-Manager-and-SSM-Parameter-Store.md)
   - This is free to use and has no additional cost unlike Secrets Manager $0.40 per secret per month. 
 - [ ] Setup the Dockerfile with the recommended way of using [uv in Docker](https://docs.astral.sh/uv/guides/integration/docker/).
 - [ ] Implement API versioning strategy (like v1 in the path).
