@@ -42,9 +42,10 @@ This project is a more polished version of the [cloud-engineering-project](https
   - This is free to use and has no additional cost unlike Secrets Manager $0.40 per secret per month.
 - [ ] Setup the Dockerfile with the recommended way of using [uv in Docker](https://docs.astral.sh/uv/guides/integration/docker/).
 - [ ] Implement API versioning strategy (like v1 in the path).
+- [ ] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
+- [ ] Deployment Stratgies like Blue-Green, Canary deployments, etc.
 - [ ] Implement authentication (API keys or AWS Cognito) and secure Swagger UI page and possiblly the API endpoints as well.
   - [ ] Add rate limiting to the API using API Gateway
-- [ ] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
   - [ ] Implement multi-environment deployment pipeline (dev/prod) with approval gates
 - [ ] Observability & Monitoring improvements:
   - [ ] Use OpenTelemetry for tracing instead of AWS X-Ray, [ref](https://aws.amazon.com/blogs/mt/aws-x-ray-sdks-daemon-migration-to-opentelemetry/).
