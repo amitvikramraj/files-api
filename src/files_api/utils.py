@@ -1,6 +1,12 @@
+# type: ignore[return]
+
 import json
 import os
+import time
+import urllib.error
 import urllib.request
+
+from loguru import logger
 
 
 # Use the AWS-Parameters-and-Secrets-Lambda-Extension to retrieve secrets from Secrets Manager
@@ -20,11 +26,20 @@ def get_secret_from_extension(secret_name: str) -> str:
     req.add_header("X-Aws-Parameters-Secrets-Token", _aws_session_auth_token)
 
     # Request/Respone Syntax: https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-    with urllib.request.urlopen(req) as response:
-        secret_response = response.read().decode("utf-8")
-        # The response is a JSON string containing the secret value
-        secret_data = json.loads(secret_response)
-        return secret_data["SecretString"]
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req) as response:
+                secret_response = response.read().decode("utf-8")
+                secret_data = json.loads(secret_response)
+                return secret_data["SecretString"]
+        except urllib.error.HTTPError as e:
+            if e.code == 400 and attempt < 2:
+                logger.info(
+                    "Retrying secret fetch from extension after HTTP 400 Bad Request error... Attempt {}", attempt + 1
+                )
+                time.sleep(0.25 * (2**attempt))
+                continue
+            raise
 
 
 # ref: https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html
@@ -40,7 +55,17 @@ def get_parameter_from_extension(name: str, decrypt: bool = True) -> str:
     req = urllib.request.Request(url=endpoint)
     req.add_header("X-Aws-Parameters-Secrets-Token", aws_session_auth_token)
 
-    with urllib.request.urlopen(req) as response:
-        data = json.loads(response.read().decode("utf-8"))
-        # Response shape mirrors SSM GetParameter API
-        return data["Parameter"]["Value"]
+    # Request/Response Syntax: https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_GetParameters.html
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req) as response:
+                data = json.loads(response.read().decode("utf-8"))
+                return data["Parameter"]["Value"]
+        except urllib.error.HTTPError as e:
+            if e.code == 400 and attempt < 2:
+                logger.info(
+                    "Retrying secret fetch from extension after HTTP 400 Bad Request error... Attempt {}", attempt + 1
+                )
+                time.sleep(0.25 * (2**attempt))
+                continue
+            raise
