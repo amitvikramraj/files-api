@@ -188,6 +188,16 @@ class FilesApiCdkStack(Stack):
         #     description="Files-API API Gateway URL",
         # )
 
+        # Print an output saying manually create the SSM SecureString parameter
+        cdk.CfnOutput(
+            self,
+            id="ManualSSMParameterCreationNotice",
+            value="Please remember to manually create the SSM Parameter Store SecureString parameter"
+            " '/files-api/openai-api-key' with your OpenAI API Key before deploying the stack."
+            f" You can create it here: https://{self.region}.console.aws.amazon.com/systems-manager/parameters/",
+            description="Manual SSM Parameter Creation Notice",
+        )
+
 
 ###############
 # --- App --- #
