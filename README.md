@@ -41,6 +41,7 @@ This project is a more polished version of the [cloud-engineering-project](https
 - [x] Used AWS SSM Parameter Store to store the OpenAI API key instead of Secrets Manager. [ref](docs/Secrets-Manager-and-SSM-Parameter-Store.md)
   - This is free to use and has no additional cost unlike Secrets Manager $0.40 per secret per month.
 - [ ] Setup the Dockerfile with the recommended way of using [uv in Docker](https://docs.astral.sh/uv/guides/integration/docker/).
+  - [ ] CDK rebuilds the Lambda Layer Docker image on every deployment. Is it possible to cache it locally and only rebuild when there are changes to files like `pyproject.toml` or `uv.lock`?
 - [ ] Implement API versioning strategy (like v1 in the path).
 - [ ] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
 - [ ] Deployment Stratgies like Blue-Green, Canary deployments, etc.
