@@ -1,7 +1,7 @@
 # ship the fastapi metrics, traces, and logs to AWS
+# TODO: Configuring watch with docker compose: https://docs.astral.sh/uv/guides/integration/docker/#configuring-watch-with-docker-compose
 
 services:
-
   fastapi:
     # logs to stdout (including metrics in EMF json format); pushes xray traces to the xray-daemon
     build:
@@ -11,7 +11,7 @@ services:
       - "8000:8000"
     environment:
       # app config
-      CREATE_BUCKET_ON_STARTUP: "true"  # in Dockerfile
+      CREATE_BUCKET_ON_STARTUP: "true" # in Dockerfile
       S3_BUCKET_NAME: "mock-bucket"
       LOGURU_LEVEL: INFO
       # openai mock (comment these out if you want to use real openai)
@@ -43,7 +43,8 @@ services:
     #   - .env
     #   - openai.env  # create this file if you want to use real OpenAI
     volumes:
-      - ./:/app
+      - ./:/app # Mount local directory
+      - /app/.venv # Anonymous volume: preserve this directory's contents in container
 
   aws-mock:
     # mock aws' endpoints on port 5000 (with moto)
@@ -58,13 +59,14 @@ services:
     image: openai-mock
     build:
       dockerfile: Dockerfile
-    entrypoint: python ./tests/mocks/openai_fastapi_mock_app.py
+    entrypoint: ["uv", "run", "./tests/mocks/openai_fastapi_mock_app.py"]
     environment:
       OPENAI_MOCK_PORT: "1080"
     ports:
       - "1080:1080"
     volumes:
-      - ./:/app
+      - ./:/app # Mount local directory
+      - /app/.venv # Anonymous volume: preserve this directory's contents in container
 
   logspout:
     # Logs: uses the docker daemon to collect logs from fastapi's stdout and push to cloudwatch
