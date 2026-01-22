@@ -1,5 +1,4 @@
 # ship the fastapi metrics, traces, and logs to AWS
-# TODO: Configuring watch with docker compose: https://docs.astral.sh/uv/guides/integration/docker/#configuring-watch-with-docker-compose
 
 services:
   fastapi:
