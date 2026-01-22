@@ -10,7 +10,6 @@ import os
 from io import BytesIO
 from pathlib import Path
 
-import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import (
     JSONResponse,
@@ -100,4 +99,6 @@ async def create_speech():
 
 
 if __name__ == "__main__":
+    import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=MOCK_PORT)
