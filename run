@@ -26,7 +26,7 @@ if [ -n "$AWS_ACCOUNT_ID" ]; then
     AWS_ACCOUNT_ID_HASH=$(echo -n "${AWS_ACCOUNT_ID}" | sha256sum | cut -c5-8)
     export S3_BUCKET_NAME="python-aws-cloud-course-bucket-${AWS_ACCOUNT_ID_HASH}" # python-aws-cloud-course-bucket-6721
 else
-    echo "WARNING: Could not retrieve AWS Account ID. Profile '$AWS_PROFILE' may not exist."
+    echo "WARNING: Could not retrieve AWS Account ID. Profile '${AWS_PROFILE:-}' may not exist."
 	echo "S3_BUCKET_NAME environment variable will not be set."
 fi
 
@@ -309,6 +309,7 @@ test:ci() {
 
 # (example) ./run.sh test tests/test_states_info.py::test__slow_add
 run-tests() {
+	set -x
 	PYTEST_EXIT_STATUS=0
 
 	# Unset AWS credentials (only if set)
