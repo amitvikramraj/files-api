@@ -153,10 +153,10 @@ jobs:
         run: npm install -g aws-cdk
 
       - name: CDK Synthesize
-        run: bash +x ./run cdk-synth:ci
+        run: bash +x ./run cdk-synth
 
       - name: CDK Deploy
-        run: bash +x ./run cdk-deploy:ci
+        run: bash +x ./run cdk-deploy
 
   publish:
     name: Publish Version Tag

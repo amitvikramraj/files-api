@@ -7,7 +7,14 @@ export AWS_REGION=us-west-2
 export AWS_DEFAULT_REGION=${AWS_REGION}
 
 # aws account id/hash used to make a unique, but consistent bucket name
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --profile $AWS_PROFILE --query "Account" --output text || echo "")
+if [ -z "${GITHUB_ACTIONS:-}" ]; then
+	# not running in GitHub Actions
+	AWS_ACCOUNT_ID=$(aws sts get-caller-identity --profile $AWS_PROFILE --query "Account" --output text)
+else
+	# running in GitHub Actions
+	# retrieve AWS Account ID from environment variable set by GitHub Actions OIDC token
+	AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text || echo "")
+fi
 
 # Only create bucket name if AWS_ACCOUNT_ID is available
 # Suppress errors if profile doesn't exist (e.g., in CI/CD)
@@ -34,6 +41,16 @@ cdk-bootstrap () {
     cdk bootstrap "aws://${AWS_ACCOUNT_ID}/${AWS_REGION}"
 }
 
+
+cdk-synth () {
+	if [ -z "${GITHUB_ACTIONS:-}" ]; then
+		cdk synth --app 'uv run --script infra.py' --profile $AWS_PROFILE --region $AWS_REGION
+	else:
+		cdk synth --app 'uv run --script infra.py' --region $AWS_REGION
+	fi
+}
+
+
 cdk-deploy () {
 	# Check if Docker is running
 	if ! docker info >/dev/null 2>&1; then
@@ -47,8 +64,13 @@ cdk-deploy () {
 		exit 1
 	fi
 
-    cdk deploy --app 'uv run --script infra.py' '*' --profile $AWS_PROFILE --region $AWS_REGION
+	if [ -z "${GITHUB_ACTIONS:-}" ]; then
+    	cdk deploy --app 'uv run --script infra.py' '*' --profile $AWS_PROFILE --region $AWS_REGION
+	else
+		cdk deploy --app 'uv run --script infra.py' '*' --region $AWS_REGION
+	fi
 }
+
 
 cdk-deploy:github_oidc_stack () {
 	set -x
@@ -72,24 +94,11 @@ cdk-deploy:github_oidc_stack () {
 		--profile $AWS_PROFILE --region $AWS_REGION
 }
 
+
 cdk-destroy () {
     cdk destroy --app 'uv run --script infra.py' '*' --profile $AWS_PROFILE --region $AWS_REGION
 }
 
-
-cdk-synth:ci () {
-	cdk synth --app 'uv run --script infra.py' --region $AWS_REGION
-}
-
-cdk-deploy:ci () {
-	# If S3_BUCKET_NAME is not set, exit with error
-	if [ -z "${S3_BUCKET_NAME:-}" ]; then
-		echo "ERROR: S3_BUCKET_NAME is not set. Cannot deploy CDK stack."
-		exit 1
-	fi
-
-	cdk deploy --app 'uv run --script infra.py' '*' --region $AWS_REGION
-}
 
 ############################
 # --- Run App  --- # #
