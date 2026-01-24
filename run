@@ -2,7 +2,11 @@
 
 set -euo pipefail
 
-export AWS_PROFILE=sandbox
+# Only set AWS_PROFILE when not running in GitHub Actions
+if [[ -z "${GITHUB_ACTIONS:-}" ]]; then
+	export AWS_PROFILE=sandbox
+fi
+
 export AWS_REGION=us-west-2
 export AWS_DEFAULT_REGION=${AWS_REGION}
 
