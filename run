@@ -311,8 +311,10 @@ test:ci() {
 run-tests() {
 	PYTEST_EXIT_STATUS=0
 
-	# Unset AWS credentials
-	unset AWS_PROFILE
+	# Unset AWS credentials (only if set)
+	if [[ -n "${AWS_PROFILE:-}" ]]; then
+		unset AWS_PROFILE
+	fi
 
 	# Disable AWS X-Ray and AWS EMF
 	export AWS_XRAY_SDK_ENABLED="false"
