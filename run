@@ -77,6 +77,20 @@ cdk-destroy () {
 }
 
 
+cdk-synth:ci () {
+	cdk synth --app 'uv run --script infra.py' --region $AWS_REGION
+}
+
+cdk-deploy:ci () {
+	# If S3_BUCKET_NAME is not set, exit with error
+	if [ -z "${S3_BUCKET_NAME:-}" ]; then
+		echo "ERROR: S3_BUCKET_NAME is not set. Cannot deploy CDK stack."
+		exit 1
+	fi
+
+	cdk deploy --app 'uv run --script infra.py' '*' --region $AWS_REGION
+}
+
 ############################
 # --- Run App  --- # #
 ############################
