@@ -89,8 +89,10 @@ class GitHubActionsOIDCRoleStack(Stack):
                 conditions={
                     "StringEquals": {
                         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+                    },
+                    "StringLike": {
                         "token.actions.githubusercontent.com:sub": f"repo:{github_repo}:*",
-                    }
+                    },
                 },
                 assume_role_action="sts:AssumeRoleWithWebIdentity",
             ),
