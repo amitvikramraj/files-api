@@ -70,7 +70,7 @@ jobs:
         run: SKIP=no-commit-to-branch uvx --from pre-commit pre-commit run --all-files
 
   build-wheel:
-    name: Build Wheel Distribution and Upload as Artifact
+    name: Build Wheel Dist & Upload as Artifact
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -129,6 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     # IDEAL WAY to do this would be deploy to dev/staging on PR merge, then either
     # Deploy to prod on merge to main or have a manual approval step.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

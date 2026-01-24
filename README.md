@@ -43,7 +43,7 @@ This project is a more polished version of the [cloud-engineering-project](https
 - [x] Setup the Dockerfile with the recommended way of using [uv in Docker](https://docs.astral.sh/uv/guides/integration/docker/).
   - [x] CDK rebuilds the Lambda Layer Docker image on every deployment. Is it possible to cache it locally and only rebuild when there are changes to files like `pyproject.toml` or `uv.lock`?
   - [ ] Try Docker multi-stage builds and configure [watch](https://docs.astral.sh/uv/guides/integration/docker/#configuring-watch-with-docker-compose) with docker compose.
-- [ ] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
+- [x] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
 - [ ] API Gateway Improvements:
   - [ ] Implement API versioning strategy (like v1 in the path).
   - [ ] API Gateway with multiple stages (dev/prod). [`aws-samples/aws-cdk-examples/api-stages-lambda`](https://github.com/aws-samples/aws-cdk-examples/tree/main/python/api-stages-lambda)
