@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "aws-cdk-lib>=2.233.0",
+#     "constructs>=10.4.4",
+# ]
+# ///
 import hashlib
 import json
 import os
