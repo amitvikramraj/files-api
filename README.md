@@ -43,13 +43,17 @@ This project is a more polished version of the [cloud-engineering-project](https
 - [x] Setup the Dockerfile with the recommended way of using [uv in Docker](https://docs.astral.sh/uv/guides/integration/docker/).
   - [x] CDK rebuilds the Lambda Layer Docker image on every deployment. Is it possible to cache it locally and only rebuild when there are changes to files like `pyproject.toml` or `uv.lock`?
   - [ ] Try Docker multi-stage builds and configure [watch](https://docs.astral.sh/uv/guides/integration/docker/#configuring-watch-with-docker-compose) with docker compose.
-- [ ] Implement API versioning strategy (like v1 in the path).
-- [ ] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
-- [ ] Deployment Stratgies like Blue-Green, Canary deployments, etc.
-- [ ] Implement authentication (API keys or AWS Cognito) and secure Swagger UI page and possiblly the API endpoints as well.
-  - [ ] Add rate limiting to the API using API Gateway
-  - [ ] Implement multi-environment deployment pipeline (dev/prod) with approval gates
+- [x] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
+- [ ] API Gateway Improvements:
+  - [ ] Implement API versioning strategy (like v1 in the path).
+  - [ ] API Gateway with multiple stages (dev/prod). [`aws-samples/aws-cdk-examples/api-stages-lambda`](https://github.com/aws-samples/aws-cdk-examples/tree/main/python/api-stages-lambda)
+  - [ ] API Throttling and Usage Plans to manage API consumption and prevent abuse.
+  - [ ] Deployment Stratgies like Blue-Green, Canary deployments, etc.
+  - [ ] Implement authentication (API keys with Usage Plans/AWS Cognito/custom JWT/IAM Auth) and secure Swagger UI page and possiblly the API endpoints as well.
+    - [ ] Add rate limiting to the API using API Gateway
+    - [ ] Implement multi-environment deployment pipeline (dev/prod) with approval gates
 - [ ] Observability & Monitoring improvements:
+  - [ ] Cloudwatch Dashboard using CDK to visualize custom metrics, logs and traces in one place. [*ref*](https://github.com/cdk-patterns/serverless/tree/main/the-cloudwatch-dashboard/python)
   - [ ] Use OpenTelemetry for tracing instead of AWS X-Ray, [ref](https://aws.amazon.com/blogs/mt/aws-x-ray-sdks-daemon-migration-to-opentelemetry/).
   - [ ] Setup Grafana dashboards with CloudWatch data sources for enhanced monitoring
   - [ ] Replace Cloudwatch with Grafana Stack -- logs, metrics and traces

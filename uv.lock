@@ -930,7 +930,7 @@ wheels = [
 
 [[package]]
 name = "files-api"
-version = "0.1.5"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "aws-embedded-metrics" },

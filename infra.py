@@ -1,4 +1,12 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "aws-cdk-lib>=2.233.0",
+#     "constructs>=10.4.4",
+# ]
+# ///
 import hashlib
+import json
 import os
 from pathlib import Path
 
@@ -7,6 +15,7 @@ from aws_cdk import (
     Stack,
     aws_apigateway as apigw,
     aws_lambda as _lambda,
+    aws_logs as logs,
     aws_s3 as s3,
     aws_ssm as ssm,
 )
@@ -120,6 +129,17 @@ class FilesApiCdkStack(Stack):
         # ^^^I found the layer ARN here from the AWS docs:
         # https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html#ps-integration-lambda-extensions-add
 
+        # Log group for Lambda function
+        # Lambda by default creates a log group of format /aws/lambda/<function-name>
+        # But here we are explicitly creating it to set retention and removal policy
+        files_api_lambda_log_group = logs.LogGroup(
+            self,
+            id="FilesApiLambdaLogGroup",
+            log_group_name="/aws/lambda/files-api",
+            retention=logs.RetentionDays.ONE_MONTH,
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+        )
+
         files_api_lambda = _lambda.Function(
             self,
             id="FilesApiLambda",
@@ -136,6 +156,8 @@ class FilesApiCdkStack(Stack):
             ),
             # Add Lambda Layers for dependencies and AWS Secrets Manager extension
             layers=[files_api_lambda_layer, secrets_manager_lambda_extension_layer],
+            # Specify the log group for the Lambda function
+            log_group=files_api_lambda_log_group,
             # Enable X-Ray Tracing for the Lambda function
             tracing=_lambda.Tracing.ACTIVE,
             environment={
@@ -166,11 +188,23 @@ class FilesApiCdkStack(Stack):
         # Grant the Lambda function permissions to read the OpenAI API Key secret from SSM Parameter Store
         ssm_openai_api_secret_key.grant_read(files_api_lambda)
 
+        # Grant the Lambda function permissions to write logs to CloudWatch Logs
+        files_api_lambda_log_group.grant_write(files_api_lambda)
+
         # Setup API Gateway with resources and methods
 
-        # The LambdaRestApi construct by default creates a `test-invoke-stage` stage for the API
+        # Log group for API Gateway access logs
+        api_gw_access_log_group_prod = logs.LogGroup(
+            self,
+            id="FilesApiGwAccessLogGroup",
+            log_group_name="/aws/apigateway/access-logs/files-api/prod",
+            retention=logs.RetentionDays.ONE_MONTH,
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+        )
 
-        # I disabled the proxy integration(proxy=False) because on the root path it defined "ANY" method by default which  we do not want.
+        # The LambdaRestApi L2 construct by default creates a `test-invoke-stage` stage for the API
+
+        # I disabled the proxy integration(proxy=False) because on the root path it defined "ANY" method by default which we do not want.
         # For the root path we only want to allow "GET" method to access the OpenAPI docs page.
         files_api_gw = apigw.LambdaRestApi(
             self,
@@ -184,7 +218,21 @@ class FilesApiCdkStack(Stack):
             deploy_options=apigw.StageOptions(
                 stage_name="prod",
                 tracing_enabled=True,
+                metrics_enabled=True,
+                # API Gateway Execution Logs: it is recommended to turn it off in production
+                # Execution logs capture detailed information about API request processing lifecycle. It should be
+                # enabled only for debugging purposes as it can quite verbose and incur additional cloudwatch costs and may expose sensitive information.
+                # AWS auto creates a log group for execution logs with format: API-Gateway-Execution-Logs/{rest-api-id}/{stage-name}
+                logging_level=None,  # apigw.MethodLoggingLevel.INFO,  # Set to INFO or ERROR to enable execution logging
+                # Access Logs: Access logs capture traffic-related information about the requests coming into API Gateway.
+                access_log_destination=apigw.LogGroupLogDestination(log_group=api_gw_access_log_group_prod),
+                # access_log_format=apigw.AccessLogFormat.clf(),  # Common Log Format for access logs
+                # access_log_format=apigw.AccessLogFormat.json_with_standard_fields(...)    # Pre-defined JSON format with standard fields
+                access_log_format=apigw_custom_access_log_format(),  # Custom JSON format for access logs
             ),
+            # Setting cloudWatchRole to true ensures CDK creates the necessary IAM role for logging
+            cloud_watch_role=True,
+            cloud_watch_role_removal_policy=cdk.RemovalPolicy.DESTROY,
             # endpoint_configuration=apigw.EndpointConfiguration(
             #     types=[apigw.EndpointType.REGIONAL],  # Use REGIONAL endpoint type for cost-effectiveness
             # ),
@@ -220,18 +268,59 @@ class FilesApiCdkStack(Stack):
         #     self,
         #     id="FilesApiGatewayUrl",
         #     value=files_api_gw.url,
-        #     description="Files-API API Gateway URL",
+        #     description="Files-API API Gateway Invoke URL",
         # )
 
         # Print an output saying manually create the SSM SecureString parameter
         cdk.CfnOutput(
             self,
             id="ManualSSMParameterCreationNotice",
-            value="Please remember to manually create the SSM Parameter Store SecureString parameter"
-            " '/files-api/openai-api-key' with your OpenAI API Key before deploying the stack."
-            f" You can create it here: https://{self.region}.console.aws.amazon.com/systems-manager/parameters/",
+            value="Please remember to manually create a SecureString parameter in AWS SSM Parameter Store with name"
+            " '/files-api/openai-api-key' with your OpenAI API Key after the first deployment of this stack.\n"
+            f"You can create it here: https://{self.region}.console.aws.amazon.com/systems-manager/parameters/",
             description="Manual SSM Parameter Creation Notice",
         )
+
+
+def apigw_custom_access_log_format() -> apigw.AccessLogFormat:
+    """
+    Custom API Gateway Access Log Format based on Alex DeBrie's blog post.
+
+    Ref:
+    - Alex DeBrie's blog post: https://www.alexdebrie.com/posts/api-gateway-access-logs/#access-logging-fields
+    - My article: https://ericriddoch.notion.site/Deep-Dive-Log-Correlation-Setting-up-Access-and-Execution-Logs-in-our-API-19a29335f6d880149ec2e1875e8b8761?pvs=143
+    """
+    # ref: Refer to Alex DeBrie's blog post for custom access log format:
+    return apigw.AccessLogFormat.custom(
+        json.dumps(
+            {  # Request Information
+                "requestTime": apigw.AccessLogField.context_request_time(),
+                "requestId": apigw.AccessLogField.context_request_id(),
+                # There is slight difference in requestId & extendedRequestId: Clients can override the requestID
+                # but not the extendedRequestId, which may be helpful for troubleshooting & debugging purposes
+                "extendedRequestId": apigw.AccessLogField.context_extended_request_id(),
+                "httpMethod": apigw.AccessLogField.context_http_method(),
+                "path": apigw.AccessLogField.context_path(),
+                "resourcePath": apigw.AccessLogField.context_resource_path(),
+                "status": apigw.AccessLogField.context_status(),
+                "responseLatency": apigw.AccessLogField.context_response_latency(),  # in milliseconds
+                "xrayTraceId": apigw.AccessLogField.context_xray_trace_id(),
+                # Integration Information
+                # AWS Endpoint Request ID: The requestID generated by Lambda function invocation
+                # "integrationRequestId": apigw.AccessLogField.context_integration_request_id,
+                "integrationRequestId": "$context.integration.requestId",
+                # Integration Response Status Code: Status code returned by the AWS Lambda function
+                "functionResponseStatus": apigw.AccessLogField.context_integration_status(),
+                # Latency of the integration, like Lambda function, in milliseconds
+                "integrationLatency": apigw.AccessLogField.context_integration_latency(),
+                # Status code returned by the AWS Lambda Service and not the backend Lambda function code
+                "integrationServiceStatus": apigw.AccessLogField.context_integration_status(),
+                # User Identity Information
+                "ip": apigw.AccessLogField.context_identity_source_ip(),
+                "userAgent": apigw.AccessLogField.context_identity_user_agent(),
+            }
+        ),
+    )
 
 
 ###############

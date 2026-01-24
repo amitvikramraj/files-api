@@ -2,12 +2,23 @@
 
 set -euo pipefail
 
-export AWS_PROFILE=sandbox
+# Only set AWS_PROFILE when not running in GitHub Actions
+if [[ -z "${GITHUB_ACTIONS:-}" ]]; then
+	export AWS_PROFILE=sandbox
+fi
+
 export AWS_REGION=us-west-2
 export AWS_DEFAULT_REGION=${AWS_REGION}
 
 # aws account id/hash used to make a unique, but consistent bucket name
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --profile $AWS_PROFILE --query "Account" --output text || echo "")
+if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+	# running in GitHub Actions
+	# retrieve AWS Account ID from environment variable set by GitHub Actions OIDC token
+	AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text || echo "")
+else
+	# not running in GitHub Actions
+	AWS_ACCOUNT_ID=$(aws sts get-caller-identity --profile $AWS_PROFILE --query "Account" --output text)
+fi
 
 # Only create bucket name if AWS_ACCOUNT_ID is available
 # Suppress errors if profile doesn't exist (e.g., in CI/CD)
@@ -15,7 +26,7 @@ if [ -n "$AWS_ACCOUNT_ID" ]; then
     AWS_ACCOUNT_ID_HASH=$(echo -n "${AWS_ACCOUNT_ID}" | sha256sum | cut -c5-8)
     export S3_BUCKET_NAME="python-aws-cloud-course-bucket-${AWS_ACCOUNT_ID_HASH}" # python-aws-cloud-course-bucket-6721
 else
-    echo "WARNING: Could not retrieve AWS Account ID. Profile '$AWS_PROFILE' may not exist."
+    echo "WARNING: Could not retrieve AWS Account ID. Profile '${AWS_PROFILE:-}' may not exist."
 	echo "S3_BUCKET_NAME environment variable will not be set."
 fi
 
@@ -34,6 +45,18 @@ cdk-bootstrap () {
     cdk bootstrap "aws://${AWS_ACCOUNT_ID}/${AWS_REGION}"
 }
 
+
+cdk-synth () {
+	# Check if variable is set and not empty
+	if [ -n "${GITHUB_ACTIONS:-}" ]; then
+		# running in GitHub Actions
+		cdk synth --app 'uv run --script infra.py' --region $AWS_REGION
+	else
+		cdk synth --app 'uv run --script infra.py' --profile $AWS_PROFILE --region $AWS_REGION
+	fi
+}
+
+
 cdk-deploy () {
 	# Check if Docker is running
 	if ! docker info >/dev/null 2>&1; then
@@ -47,8 +70,37 @@ cdk-deploy () {
 		exit 1
 	fi
 
-    cdk deploy --app 'uv run --script infra.py' '*' --profile $AWS_PROFILE --region $AWS_REGION
+	if [ -n "${GITHUB_ACTIONS:-}" ]; then
+		# running in GitHub Actions
+		cdk deploy --app 'uv run --script infra.py' '*' --region $AWS_REGION
+	else
+    	cdk deploy --app 'uv run --script infra.py' '*' --profile $AWS_PROFILE --region $AWS_REGION
+	fi
 }
+
+
+cdk-deploy:github_oidc_stack () {
+	set -x
+	local github_repo=${1}	# avr2002/files-api
+	local create_oidc_provider=${2:-false}	# boolean to indicate whether to create a new OIDC provider
+
+	if [ -z "$github_repo" ]; then
+		echo "ERROR: GitHub repository not specified. Usage: cdk-deploy:github_oidc_stack <github_repo>. E.g., avr2002/files-api"
+		exit 1
+	fi
+
+	# Check if create_oidc_provider is a boolean
+	if [[ "$create_oidc_provider" != "true" && "$create_oidc_provider" != "false" ]]; then
+		echo "ERROR: create_oidc_provider must be 'true' or 'false'."
+		exit 1
+	fi
+
+	cdk deploy --app 'uv run --script github_oidc_infra.py' '*' \
+		--context github_repo="$github_repo" \
+		--context create_oidc_provider="$create_oidc_provider" \
+		--profile $AWS_PROFILE --region $AWS_REGION
+}
+
 
 cdk-destroy () {
     cdk destroy --app 'uv run --script infra.py' '*' --profile $AWS_PROFILE --region $AWS_REGION
@@ -257,10 +309,13 @@ test:ci() {
 
 # (example) ./run.sh test tests/test_states_info.py::test__slow_add
 run-tests() {
+	set -x
 	PYTEST_EXIT_STATUS=0
 
-	# Unset AWS credentials
-	unset AWS_PROFILE
+	# Unset AWS credentials (only if set)
+	if [[ -n "${AWS_PROFILE:-}" ]]; then
+		unset AWS_PROFILE
+	fi
 
 	# Disable AWS X-Ray and AWS EMF
 	export AWS_XRAY_SDK_ENABLED="false"
