@@ -46,7 +46,7 @@ This project is a more polished version of the [cloud-engineering-project](https
 - [x] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
   - [x] Used OpenID Connect to deploy to AWS in GitHub Actions.
   - [ ] Try AWS CodePipeline as alternative? [ref: [link1](https://youtu.be/EVDw0sdxaec?si=VcfZj52suQc_pxa5)]
-  - video: [The IDEAL & Practical CI / CD Pipeline - Concepts Overview]((https://youtu.be/OPwU3UWCxhw?si=mmVkOFEaarkdp4eZ)) - Be A Better Dev
+  - video: [The IDEAL & Practical CI / CD Pipeline - Concepts Overview](https://youtu.be/OPwU3UWCxhw?si=mmVkOFEaarkdp4eZ) - Be A Better Dev
 - [ ] API Gateway Improvements:
   - [ ] Implement API versioning strategy (like v1 in the path).
   - [ ] API Gateway with multiple stages (dev/prod). [`aws-samples/aws-cdk-examples/api-stages-lambda`](https://github.com/aws-samples/aws-cdk-examples/tree/main/python/api-stages-lambda)
