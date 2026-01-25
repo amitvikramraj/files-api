@@ -42,4 +42,3 @@ ref:
     - https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers.html
     - https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc.html
     - [OpenID Connect Official Page](https://openid.net/developers/how-connect-works/)
-    - 

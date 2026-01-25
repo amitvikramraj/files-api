@@ -44,6 +44,9 @@ This project is a more polished version of the [cloud-engineering-project](https
   - [x] CDK rebuilds the Lambda Layer Docker image on every deployment. Is it possible to cache it locally and only rebuild when there are changes to files like `pyproject.toml` or `uv.lock`?
   - [ ] Try Docker multi-stage builds and configure [watch](https://docs.astral.sh/uv/guides/integration/docker/#configuring-watch-with-docker-compose) with docker compose.
 - [x] Setup CI/CD pipeline to deploy the API to AWS using GitHub Actions.
+  - [x] Used OpenID Connect to deploy to AWS in GitHub Actions.
+  - [ ] Try AWS CodePipeline as alternative? [ref: [link1](https://youtu.be/EVDw0sdxaec?si=VcfZj52suQc_pxa5)]
+  - video: [The IDEAL & Practical CI / CD Pipeline - Concepts Overview]((https://youtu.be/OPwU3UWCxhw?si=mmVkOFEaarkdp4eZ)) - Be A Better Dev
 - [ ] API Gateway Improvements:
   - [ ] Implement API versioning strategy (like v1 in the path).
   - [ ] API Gateway with multiple stages (dev/prod). [`aws-samples/aws-cdk-examples/api-stages-lambda`](https://github.com/aws-samples/aws-cdk-examples/tree/main/python/api-stages-lambda)
