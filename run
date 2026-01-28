@@ -107,6 +107,18 @@ cdk-destroy () {
 }
 
 
+# CDK Garbage Collection
+# ref: https://aws.amazon.com/blogs/devops/announcing-cdk-garbage-collection/
+# https://docs.aws.amazon.com/cdk/v2/guide/ref-cli-cmd-gc.html
+cdk-gc () {
+	local ENV_NAME="aws://$(aws sts get-caller-identity --profile $AWS_PROFILE --query "Account" --output text)/$AWS_REGION"
+
+	cdk gc --unstable=gc \
+		--profile $AWS_PROFILE \
+		--app 'uv run --script infra.py' \
+		"$ENV_NAME"
+}
+
 ############################
 # --- Run App  --- # #
 ############################
