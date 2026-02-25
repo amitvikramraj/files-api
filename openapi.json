@@ -3,7 +3,7 @@
   "info": {
     "title": "Files API",
     "summary": "Store and Retrieve Files.",
-    "description": "<a href=\"https://github.com/avr2002\" target=\"_blank\">            <img src=\"https://img.shields.io/badge/Maintained%20by-Amit%20Vikram%20Raj-F4BBFF?style=for-the-badge\">        </a>\n<a href=\"https://github.com/avr2002/files-api\" target=\"_blank\">            <img src=\"https://img.shields.io/badge/github-repo-000000?style=for-the-badge&logo=github\">        </a>\n<a href=\"https://mlops-club.org\" target=\"_blank\">            <img src=\"https://img.shields.io/badge/MLOps%20Club-05998B?style=for-the-badge\">        </a>\n<br>\n",
+    "description": "<a href=\"https://github.com/avr2002\" target=\"_blank\">        <img src=\"https://img.shields.io/badge/Maintained%20by-Amit%20Vikram%20Raj-F4BBFF?style=for-the-badge\">    </a>\n<a href=\"https://github.com/avr2002/files-api\" target=\"_blank\">        <img src=\"https://img.shields.io/badge/github-repo-000000?style=for-the-badge&logo=github\">    </a>\n<a href=\"https://mlops-club.org\" target=\"_blank\">        <img src=\"https://img.shields.io/badge/MLOps%20Club-05998B?style=for-the-badge\">    </a>\n<br>\n",
     "contact": {
       "name": "Amit Vikram Raj",
       "url": "https://www.linkedin.com/in/avr27/",
@@ -17,7 +17,26 @@
     "version": "v1"
   },
   "paths": {
-    "/v1/files/{file_path}": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Health Check"
+        ],
+        "summary": "Health",
+        "operationId": "Health Check-health",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/{file_path}": {
       "put": {
         "tags": [
           "Files"
@@ -279,7 +298,7 @@
         }
       }
     },
-    "/v1/files": {
+    "/api/v1/files": {
       "get": {
         "tags": [
           "Files"
@@ -394,7 +413,7 @@
         }
       }
     },
-    "/v1/files/generated": {
+    "/api/v1/files/generated": {
       "post": {
         "tags": [
           "Generate Files"

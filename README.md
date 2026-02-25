@@ -47,8 +47,10 @@ This project is a more polished version of the [cloud-engineering-project](https
   - [x] Used OpenID Connect to deploy to AWS in GitHub Actions.
   - [ ] Try AWS CodePipeline as alternative? [ref: [link1](https://youtu.be/EVDw0sdxaec?si=VcfZj52suQc_pxa5), [link2](https://docs.aws.amazon.com/cdk/v2/guide/cdk-pipeline.html)]
   - video: [The IDEAL & Practical CI / CD Pipeline - Concepts Overview](https://youtu.be/OPwU3UWCxhw?si=mmVkOFEaarkdp4eZ) - Be A Better Dev
+- [x] Put Files API behind AWS Cognito User Pools for authentication with option to Sign-in with Google. [Be a Better Dev Video](https://www.youtube.com/watch?v=oFSU6rhFETk)
+  - See [infra.py](./infra.py) for implementation details.
 - [ ] API Gateway Improvements:
-  - [ ] Implement API versioning strategy (like v1 in the path).
+  - [x] Implement API versioning strategy (like v1 in the path).
   - [ ] API Gateway with multiple stages (dev/prod). [`aws-samples/aws-cdk-examples/api-stages-lambda`](https://github.com/aws-samples/aws-cdk-examples/tree/main/python/api-stages-lambda)
   - [ ] API Throttling and Usage Plans to manage API consumption and prevent abuse.
   - [ ] Deployment Stratgies like Blue-Green, Canary deployments, etc.
@@ -228,7 +230,8 @@ flowchart LR
 
 | Component | Description |
 |-----------|-------------|
-| **API Gateway** | REST API (regional), `prod` stage; GET on `/`, ANY on `/{proxy+}`; X-Ray and access logging enabled. |
+| **API Gateway** | REST API (regional), `prod` stage; GET on `/`, ANY on `/{proxy+}`; Cognito User Pools authorizer validates JWT; X-Ray and access logging enabled. |
+| **Cognito (Auth)** | User Pool with Hosted UI (Cognito domain), User Pool Client (authorization code grant), and Google IdP; users sign in via Hosted UI or Google, then call the API with a Bearer token; API Gateway authorizer validates the token against the User Pool. |
 | **Lambda** | `files-api` function (Python 3.12, ARM64); custom layer for dependencies; AWS Parameters and Secrets Lambda Extension to read SSM/Secrets Manager. |
 | **S3** | Bucket for file storage; Lambda has read/write access. |
 | **SSM Parameter Store** | SecureString `/files-api/openai-api-key` for OpenAI API key (created manually). |

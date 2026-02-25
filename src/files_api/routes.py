@@ -1,6 +1,7 @@
 """FastAPI application for managing files in an S3 bucket."""
 
 import mimetypes
+import os
 from typing import Annotated
 
 import requests  # type: ignore
@@ -16,7 +17,8 @@ from fastapi import (
     UploadFile,
     status,
 )
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.security import OAuth2AuthorizationCodeBearer
 from loguru import logger
 
 from files_api.generate_files.openai import (
@@ -44,8 +46,29 @@ from files_api.schemas import (
 )
 from files_api.settings import Settings
 
-ROUTER = APIRouter()
-ROUTER.route_class = RouteHandler
+if os.getenv("LOCAL_MODE", "true").lower() == "true":
+    ROUTER = APIRouter()
+    ROUTER.route_class = RouteHandler
+else:
+    COGNITO_DOMAIN = os.environ["COGNITO_DOMAIN"]  # e.g. "your-prefix.auth.us-east-1.amazoncognito.com"
+    COGNITO_REGION = os.environ["AWS_REGION"]
+
+    authorize_url = f"https://{COGNITO_DOMAIN}/oauth2/authorize"
+    token_url = f"https://{COGNITO_DOMAIN}/oauth2/token"
+
+    oauth2_scheme = OAuth2AuthorizationCodeBearer(
+        authorizationUrl=authorize_url,
+        tokenUrl=token_url,
+    )
+
+    ROUTER = APIRouter(dependencies=[Depends(oauth2_scheme)])
+    ROUTER.route_class = RouteHandler
+
+
+@ROUTER.get("/health", tags=["Health Check"])
+async def health():
+    """Health Check endpoint(to test authentication)."""
+    return JSONResponse(status_code=200, content={"ok": True})
 
 
 @ROUTER.put(

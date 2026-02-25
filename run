@@ -4,7 +4,7 @@ set -euox pipefail
 
 # Only set AWS_PROFILE when not running in GitHub Actions
 if [[ -z "${GITHUB_ACTIONS:-}" ]]; then
-	export AWS_PROFILE=sandbox
+	export AWS_PROFILE="files-api"
 fi
 
 export AWS_REGION=us-west-2
@@ -17,7 +17,7 @@ if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
 	AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text || echo "")
 else
 	# not running in GitHub Actions
-	AWS_ACCOUNT_ID=$(aws sts get-caller-identity --profile $AWS_PROFILE --query "Account" --output text)
+	AWS_ACCOUNT_ID=$(aws sts get-caller-identity --profile $AWS_PROFILE --query "Account" --output text || echo "")
 fi
 
 # Only create bucket name if AWS_ACCOUNT_ID is available
@@ -29,6 +29,12 @@ else
     echo "WARNING: Could not retrieve AWS Account ID. Profile '${AWS_PROFILE:-}' may not exist."
 	echo "S3_BUCKET_NAME environment variable will not be set."
 fi
+
+
+# suppress warning about untested Node.js version
+export JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION=1
+# controls how the CDK handles deprecation warnings from the underlying jsii framework
+export JSII_DEPRECATED=quiet
 
 
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -140,7 +146,14 @@ run-docker() {
 		exit 1
 	fi
 
-    aws configure export-credentials --profile $AWS_PROFILE --format env > .env
+	touch .env
+
+	# To locally send the Logs, Metrics, and Traces to Cloudwatch,
+	# Uncomment the below command and in docker-compose.yaml file,
+	# Set the AWS_XRAY_SDK_ENABLED to true, AWS_EMF_DISABLE_METRIC_EXTRACTION to true
+	# and comment the LOGSPOUT: "ignore" in docker-compose.yaml file.
+
+    # aws configure export-credentials --profile $AWS_PROFILE --format env > .env
     docker compose up --remove-orphans --build
 }
 

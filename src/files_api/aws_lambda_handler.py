@@ -25,7 +25,7 @@ def handler(event, context):
     # ^^^Using the global statement to update `_CACHED_OPENAI_API_KEY` is discouraged
 
     # Only fetch if not already cached
-    if _CACHED_OPENAI_API_KEY is None:
+    if _CACHED_OPENAI_API_KEY is None or os.getenv("OPENAI_API_KEY") is None:
         # Export the OpenAI API Key from secerets manager as an environment variable
         # _CACHED_OPENAI_API_KEY = get_secret_from_extension(secret_name=os.environ["OPENAI_API_SECRET_NAME"])
 
