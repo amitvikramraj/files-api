@@ -9,8 +9,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # local mode for Cognito Configuration
-      LOCAL_MODE: "true"
       # app config
       CREATE_BUCKET_ON_STARTUP: "true" # in Dockerfile
       S3_BUCKET_NAME: "mock-bucket"

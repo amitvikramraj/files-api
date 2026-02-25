@@ -46,7 +46,7 @@ from files_api.schemas import (
 )
 from files_api.settings import Settings
 
-if os.getenv("LOCAL_MODE", "true").lower() == "true":
+if os.getenv("COGNITO_ENABLED", "false").lower() == "false":
     ROUTER = APIRouter()
     ROUTER.route_class = RouteHandler
 else:

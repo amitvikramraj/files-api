@@ -149,11 +149,12 @@ run-docker() {
 	touch .env
 
 	# To locally send the Logs, Metrics, and Traces to Cloudwatch,
-	# Uncomment the below command and in docker-compose.yaml file,
+	# - Uncomment the below command
+    # aws configure export-credentials --profile $AWS_PROFILE --format env > .env
+	
+	# - and in docker-compose.yaml file:
 	# Set the AWS_XRAY_SDK_ENABLED to true, AWS_EMF_DISABLE_METRIC_EXTRACTION to true
 	# and comment the LOGSPOUT: "ignore" in docker-compose.yaml file.
-
-    # aws configure export-credentials --profile $AWS_PROFILE --format env > .env
     docker compose up --remove-orphans --build
 }
 

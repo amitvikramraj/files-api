@@ -177,8 +177,9 @@ class FilesApiCdkStack(Stack):
                 # Enable caching of secrets to reduce latency and cost
                 "SECRETS_MANAGER_TTL": "300",  # Cache secrets for 300 seconds, Time-to-live for cached secrets.
                 ## Cognito configuration - Needed when Cognito is enabled
-                "COGNITO_DOMAIN": "<replace-with-actual-cognito-domain-from-cdk-output>",
-                "COGNITO_USER_POOL_CLIENT_ID": "<replace-with-actual-cognito-user-pool-client-id-from-cdk-output>",
+                # "COGNITO_ENABLED": "true",
+                # "COGNITO_DOMAIN": "<replace-with-actual-cognito-domain-from-cdk-output>",
+                # "COGNITO_USER_POOL_CLIENT_ID": "<replace-with-actual-cognito-user-pool-client-id-from-cdk-output>",
             },
         )
 
@@ -199,8 +200,9 @@ class FilesApiCdkStack(Stack):
             handler=files_api_lambda,
         )
         setup_api_routes_and_methods_without_authorizer(api_gw=files_api_gw)
+        # ^^^Comment this out if you want to enable Cognito
 
-        # UNCOMMENT BELOW CODE TO ENABLE COGNITO
+        # UNCOMMENT BELOW CODE TO ENABLE COGNITO - Also make sure to uncomment the env vars in Lambda Function defined above
         # # Setup Cognito User Pool
         # # (must not depend on API Gateway to avoid circular dependency)
 

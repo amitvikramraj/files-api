@@ -48,7 +48,7 @@ def create_app(settings: Union[Settings, None] = None) -> FastAPI:
     """Create a FastAPI application."""
     settings = settings or Settings()
 
-    if os.getenv("LOCAL_MODE", "true").lower() == "true":
+    if os.getenv("COGNITO_ENABLED", "false").lower() == "false":
         swagger_ui_init_oauth = None
     else:
         swagger_ui_init_oauth = {
