@@ -9,10 +9,11 @@ from fastapi import (
     Request,
     Response,
 )
-from loguru import logger
+from loguru import RecordException, logger
 
 
 def configure_logger():
+    """Configure the logger."""
     logger.remove()  # remove the default logger
     logger.add(
         sink=sys.stdout,
@@ -48,7 +49,10 @@ def process_log_record(record: "loguru.Record") -> "loguru.Record":
     return record
 
 
-def get_formatted_stacktrace(loguru_record_exception, replace_newline_character_with_carriage_return: bool) -> str:
+def get_formatted_stacktrace(
+    loguru_record_exception: RecordException,
+    replace_newline_character_with_carriage_return: bool,
+) -> str:
     """Get the formatted stacktrace for the current exception."""
     exc_type, exc_value, exc_traceback = loguru_record_exception
     stacktrace_: list[str] = traceback.format_exception(exc_type, exc_value, exc_traceback)
