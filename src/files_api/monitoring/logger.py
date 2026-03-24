@@ -2,6 +2,7 @@ import json
 import os
 import sys
 import traceback
+from typing import TYPE_CHECKING
 from uuid import uuid4
 
 import loguru
@@ -9,7 +10,10 @@ from fastapi import (
     Request,
     Response,
 )
-from loguru import RecordException, logger
+from loguru import logger
+
+if TYPE_CHECKING:
+    from loguru import RecordException
 
 
 def configure_logger():
@@ -50,7 +54,7 @@ def process_log_record(record: "loguru.Record") -> "loguru.Record":
 
 
 def get_formatted_stacktrace(
-    loguru_record_exception: RecordException,
+    loguru_record_exception: "RecordException",
     replace_newline_character_with_carriage_return: bool,
 ) -> str:
     """Get the formatted stacktrace for the current exception."""
